@@ -1,0 +1,31 @@
+# Delete old pod
+$ kubectl delete service helloworld
+$ kubectl delete deployment helloworld
+
+# Deploy new version image
+$ kubectl create deployment helloworld --image=b5wang/helloworld:1.1
+$ kubectl get deployments
+$ kubectl get pods
+
+# Create a service expose application
+$ kubectl expose deployment helloworld --type=LoadBalancer --port=8080
+$ kubectl get services
+$ minikube service helloworld
+
+# Observe log, pods with dashboard
+$ minikube dashboard
+$ docker ps
+$ docker ps -a
+$ docker logs -ft <containerid>
+$ docker service logs -ft <containerid>
+
+# Got low level information of container
+$ docker inspect <containerid>
+
+# deploy 
+$ kubectl apply -f counter-pod.yaml
+$ kubectl get pods
+$ kubectl logs -f counter
+$ kubectl delete pod counter
+
+
