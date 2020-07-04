@@ -1,0 +1,111 @@
+$ kubectl get namespaces
+NAME              STATUS   AGE
+default           Active   111m
+kube-node-lease   Active   111m
+kube-public       Active   111m
+kube-system       Active   111m
+---
+$ kubectl get pods --all-namespaces
+NAMESPACE     NAME                               READY   STATUS    RESTARTS   AGE
+kube-system   coredns-66bff467f8-bphj8           1/1     Running   0          112m
+kube-system   coredns-66bff467f8-bs7k6           1/1     Running   0          112m
+kube-system   etcd-minikube                      1/1     Running   1          112m
+kube-system   kube-apiserver-minikube            1/1     Running   1          112m
+kube-system   kube-controller-manager-minikube   1/1     Running   1          112m
+kube-system   kube-proxy-q9smd                   1/1     Running   0          112m
+kube-system   kube-scheduler-minikube            1/1     Running   1          112m
+kube-system   storage-provisioner                1/1     Running   1          112m
+---
+$ minikube addons list
+|-----------------------------|----------|--------------|
+|         ADDON NAME          | PROFILE  |    STATUS    |
+|-----------------------------|----------|--------------|
+| ambassador                  | minikube | disabled     |
+| dashboard                   | minikube | disabled     |
+| default-storageclass        | minikube | enabled ✅   |
+| efk                         | minikube | disabled     |
+| freshpod                    | minikube | disabled     |
+| gvisor                      | minikube | disabled     |
+| helm-tiller                 | minikube | disabled     |
+| ingress                     | minikube | disabled     |
+| ingress-dns                 | minikube | disabled     |
+| istio                       | minikube | disabled     |
+| istio-provisioner           | minikube | disabled     |
+| logviewer                   | minikube | disabled     |
+| metallb                     | minikube | disabled     |
+| metrics-server              | minikube | disabled     |
+| nvidia-driver-installer     | minikube | disabled     |
+| nvidia-gpu-device-plugin    | minikube | disabled     |
+| olm                         | minikube | disabled     |
+| registry                    | minikube | disabled     |
+| registry-aliases            | minikube | disabled     |
+| registry-creds              | minikube | disabled     |
+| storage-provisioner         | minikube | enabled ✅   |
+| storage-provisioner-gluster | minikube | disabled     |
+|-----------------------------|----------|--------------|
+---
+$ minikube addons enable dashboard
+---
+# Get info of dashboard
+$ kubectl describe pod kubernetes-dashboard-696dbcc666-v76hd --namespace kubernetes-dashboard 
+Name:         kubernetes-dashboard-696dbcc666-v76hd
+Namespace:    kubernetes-dashboard
+Priority:     0
+Node:         minikube/192.168.64.4
+Start Time:   Sun, 14 Jun 2020 21:54:25 +0800
+Labels:       k8s-app=kubernetes-dashboard
+              pod-template-hash=696dbcc666
+Annotations:  <none>
+Status:       Running
+IP:           172.17.0.5
+IPs:
+  IP:           172.17.0.5
+Controlled By:  ReplicaSet/kubernetes-dashboard-696dbcc666
+Containers:
+  kubernetes-dashboard:
+    Container ID:  docker://9284ee7c0893821185cc669c42e5175a5e2517ceb7e17857394ac30d267ce635
+    Image:         kubernetesui/dashboard:v2.0.0
+    Image ID:      docker-pullable://kubernetesui/dashboard@sha256:06868692fb9a7f2ede1a06de1b7b32afabc40ec739c1181d83b5ed3eb147ec6e
+    Port:          9090/TCP
+    Host Port:     0/TCP
+    Args:
+      --namespace=kubernetes-dashboard
+      --enable-skip-login
+      --disable-settings-authorizer
+    State:          Running
+      Started:      Sun, 14 Jun 2020 21:54:26 +0800
+    Ready:          True
+    Restart Count:  0
+    Liveness:       http-get http://:9090/ delay=30s timeout=30s period=10s #success=1 #failure=3
+    Environment:    <none>
+    Mounts:
+      /tmp from tmp-volume (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kubernetes-dashboard-token-pmfq9 (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  tmp-volume:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kubernetes-dashboard-token-pmfq9:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  kubernetes-dashboard-token-pmfq9
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  beta.kubernetes.io/os=linux
+Tolerations:     node-role.kubernetes.io/master:NoSchedule
+                 node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason     Age        From               Message
+  ----    ------     ----       ----               -------
+  Normal  Scheduled  <unknown>  default-scheduler  Successfully assigned kubernetes-dashboard/kubernetes-dashboard-696dbcc666-v76hd to minikube
+  Normal  Pulled     12m        kubelet, minikube  Container image "kubernetesui/dashboard:v2.0.0" already present on machine
+  Normal  Created    12m        kubelet, minikube  Created container kubernetes-dashboard
+  Normal  Started    12m        kubelet, minikube  Started container kubernetes-dashboard
+
