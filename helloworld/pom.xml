@@ -78,6 +78,17 @@
                             <commandlineArgs>build --no-cache --tag b5wang/helloworld:1.1 -f ${project.build.directory}/docker-build/Dockerfile ${project.build.directory}</commandlineArgs>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>exec-kubectl-deploy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>kubectl</executable>
+                            <commandlineArgs>apply -f ${project.basedir}/src/deployments/helloworld-app.yaml</commandlineArgs>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

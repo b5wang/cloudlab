@@ -28,4 +28,16 @@ $ kubectl get pods
 $ kubectl logs -f counter
 $ kubectl delete pod counter
 
+#########################################
+# Get minikube docker env
+$ minikube docker-env
+# To point your shell to minikube's docker-daemon, run:
+eval $(minikube -p minikube docker-env)
+# Get minikube ip address
+minikube ip
+
+
+
+
+
 
