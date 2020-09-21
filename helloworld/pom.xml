@@ -34,13 +34,14 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <!-- =========================================================================
-              == Copy docker config files into target/docker-build folder               ==
+              == Copy resources into target folder                                      ==
               ========================================================================= -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
                 <executions>
+                    <!-- resources to build docker image -->
                     <execution>
                         <id>generate-docker-build</id>
                         <phase>generate-resources</phase>
@@ -59,15 +60,15 @@
                     </execution>
                 </executions>
             </plugin>
-
             <!-- =========================================================================
-              == Create docker image                                                    ==
+              == Execute commands                                                       ==
               ========================================================================= -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <executions>
+                    <!-- Build docker image -->
                     <execution>
                         <id>exec-docker-build</id>
                         <phase>package</phase>
@@ -79,6 +80,7 @@
                             <commandlineArgs>build --no-cache --tag ${docker.registry}/${project.artifactId}:${project.version} -f ${project.build.directory}/docker-build/Dockerfile ${project.build.directory}</commandlineArgs>
                         </configuration>
                     </execution>
+                    <!-- Deploy app to kubernetes with yaml -->
                     <execution>
                         <id>exec-kubectl-deploy</id>
                         <phase>package</phase>
@@ -92,7 +94,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <!-- fix error java.lang.ClassNotFoundException: org.apache.maven.doxia.siterenderer.DocumentContent -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
