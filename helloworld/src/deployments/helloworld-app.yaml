@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: helloworld
-          image: b5wang/helloworld:1.1
+          image: b5wang/helloworld:1.1-SNAPSHOT
           ports:
             - containerPort: 9090
           env:
