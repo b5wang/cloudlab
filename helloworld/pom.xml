@@ -58,6 +58,23 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <!-- resources for k8s deployment -->
+                    <execution>
+                        <id>generate-k8s-deployment</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/k8s</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/k8s</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- =========================================================================
@@ -80,6 +97,22 @@
                             <commandlineArgs>build --no-cache --tag ${docker.registry}/${project.artifactId}:${project.version} -f ${project.build.directory}/docker-build/Dockerfile ${project.build.directory}</commandlineArgs>
                         </configuration>
                     </execution>
+                    <!-- Remove app before re-deployment -->
+                    <execution>
+                        <id>exec-kubectl-delete</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>kubectl</executable>
+                            <commandlineArgs>delete -n default deployment ${project.artifactId}</commandlineArgs>
+                            <successCodes>
+                                <successCode>0</successCode>
+                                <successCode>1</successCode>
+                            </successCodes>
+                        </configuration>
+                    </execution>
                     <!-- Deploy app to kubernetes with yaml -->
                     <execution>
                         <id>exec-kubectl-deploy</id>
@@ -89,7 +122,7 @@
                         </goals>
                         <configuration>
                             <executable>kubectl</executable>
-                            <commandlineArgs>apply -f ${project.basedir}/src/deployments/helloworld-app.yaml</commandlineArgs>
+                            <commandlineArgs>apply -f ${project.build.directory}/k8s/${project.artifactId}.yaml</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>
