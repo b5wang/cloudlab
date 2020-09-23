@@ -11,9 +11,10 @@
 
     <groupId>com.b5wang.cloudlab</groupId>
     <artifactId>helloworld</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>helloworld</name>
+    <description>A sample project for micro-services with spring-boot</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,18 +59,18 @@
                             </resources>
                         </configuration>
                     </execution>
-                    <!-- resources for k8s deployment -->
+                    <!-- resources to build helm chart -->
                     <execution>
-                        <id>generate-k8s-deployment</id>
+                        <id>generate-exploded-chart</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/k8s</outputDirectory>
+                            <outputDirectory>${project.build.directory}/helm-chart/${project.artifactId}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/src/k8s</directory>
+                                    <directory>${project.basedir}/src/helm/chart</directory>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
@@ -85,6 +86,18 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <executions>
+                    <!-- test helm chart files format -->
+                    <execution>
+                        <id>exec-helm-lint</id>
+                        <phase>test</phase>
+                        <configuration>
+                            <executable>helm</executable>
+                            <commandlineArgs>lint ${project.build.directory}/helm-chart/${project.artifactId}</commandlineArgs>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
                     <!-- Build docker image -->
                     <execution>
                         <id>exec-docker-build</id>
@@ -97,33 +110,45 @@
                             <commandlineArgs>build --no-cache --tag ${docker.registry}/${project.artifactId}:${project.version} -f ${project.build.directory}/docker-build/Dockerfile ${project.build.directory}</commandlineArgs>
                         </configuration>
                     </execution>
-                    <!-- Remove app before re-deployment -->
+                    <!-- delete released helm chart, ignore if no release -->
                     <execution>
-                        <id>exec-kubectl-delete</id>
+                        <id>exec-helm-delete</id>
                         <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
                         <configuration>
-                            <executable>kubectl</executable>
-                            <commandlineArgs>delete -n default deployment ${project.artifactId}</commandlineArgs>
+                            <executable>helm</executable>
+                            <commandlineArgs>uninstall ${project.artifactId} --namespace default</commandlineArgs>
                             <successCodes>
                                 <successCode>0</successCode>
                                 <successCode>1</successCode>
                             </successCodes>
                         </configuration>
-                    </execution>
-                    <!-- Deploy app to kubernetes with yaml -->
-                    <execution>
-                        <id>exec-kubectl-deploy</id>
-                        <phase>package</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                    </execution>
+                    <!-- package helm chart -->
+                    <execution>
+                        <id>exec-helm-package</id>
+                        <phase>package</phase>
                         <configuration>
-                            <executable>kubectl</executable>
-                            <commandlineArgs>apply -f ${project.build.directory}/k8s/${project.artifactId}.yaml</commandlineArgs>
+                            <executable>helm</executable>
+                            <commandlineArgs>package ${project.build.directory}/helm-chart/${project.artifactId} -d ${project.build.directory}</commandlineArgs>
                         </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                    <!-- release helm chart -->
+                    <execution>
+                        <id>exec-helm-install</id>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <executable>helm</executable>
+                            <commandlineArgs>install ${project.artifactId} ${project.build.directory}/${project.artifactId}-${project.version}.tgz --wait --debug</commandlineArgs>
+                        </configuration>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

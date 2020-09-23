@@ -1,0 +1,11 @@
+docker:
+    registry: b5wang
+
+deployment:
+    replicas: 1
+    targetPort: 9090
+
+service:
+    port: 9090
+    targetPort: 9090
+    nodePort: 30090

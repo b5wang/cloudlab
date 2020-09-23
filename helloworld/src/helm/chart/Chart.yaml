@@ -1,0 +1,7 @@
+apiVersion: v1
+name: @project.artifactId@
+version: @project.version@
+appVersion: @project.version@
+description: @project.description@
+keywords:
+- @project.artifactId@

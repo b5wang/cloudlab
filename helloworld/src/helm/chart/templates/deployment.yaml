@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  replicas: {{ .Values.deployment.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ .Values.docker.registry }}/@project.artifactId@:@project.version@
+          ports:
+            - containerPort: {{ .Values.deployment.targetPort }}
+          env:
+            - name: JAVA_OPTS
+              value: -server -Xms32m -Xmx32m
