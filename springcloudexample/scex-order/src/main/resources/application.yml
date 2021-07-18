@@ -1,0 +1,11 @@
+server:
+  port: 8003
+spring:
+  application:
+    name: scex-order
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
