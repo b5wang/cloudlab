@@ -3,9 +3,23 @@ server:
 spring:
   application:
     name: scex-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: scex-order
+          uri: lb://scex-order
+          predicates:
+          - Path=/scex-order/**
 eureka:
   instance:
     hostname: localhost
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+logging:
+  level:
+    org.springframework.cloud.gateway: debug
